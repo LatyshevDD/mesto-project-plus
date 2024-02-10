@@ -7,6 +7,9 @@ const { PORT = 3000 } = process.env;
 
 const app = express();
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 mongoose.connect('mongodb://localhost:27017/mestodb');
 
 app.get('/', (req: Request, res: Response) => {
@@ -28,7 +31,7 @@ app.use((err: IError, req: Request, res: Response, next: NextFunction) => {
     .status(statusCode)
     .send({
       message: statusCode === 500
-        ? 'На сервере произошла ошибка'
+        ? 'Ошибка по умолчанию'
         : message
     });
 });
