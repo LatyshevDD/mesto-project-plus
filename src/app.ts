@@ -1,7 +1,9 @@
 import express, { Request, Response, NextFunction} from 'express';
 import mongoose from 'mongoose';
 import { IError } from './types/types';
+import { IRequest } from './types/types';
 import userRouter from './routes/users';
+import cardRouter from './routes/cards';
 
 const { PORT = 3000 } = process.env;
 
@@ -22,7 +24,16 @@ app.get('/', (req: Request, res: Response) => {
     );
 });
 
+app.use((req: IRequest, res: Response, next: NextFunction) => {
+  req.user = {
+    _id: '5d8b8592978f8bd833ca8133'
+  };
+
+  next();
+});
+
 app.use('/', userRouter);
+app.use('/', cardRouter);
 
 app.use((err: IError, req: Request, res: Response, next: NextFunction) => {
   const { statusCode = 500, message } = err;

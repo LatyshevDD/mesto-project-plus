@@ -1,6 +1,7 @@
 import User from "../models/user";
 import { Request, Response, NextFunction } from 'express';
 import NotFoundError from "../errors/not-found-error-404";
+import NotCorrectDataError from "../errors/not-correct-data-400";
 
 export const getUsers = (req: Request, res: Response) => {
   User.find({})
@@ -24,6 +25,11 @@ export const postUser = (req: Request, res: Response, next: NextFunction) => {
   const { name, about, avatar } = req.body;
 
   User.create({ name, about, avatar })
-    .then(user => res.send({ data: user }))
-    .catch(err => res.status(500).send({ message: 'Произошла ошибка' }));
+    .then(user => {
+      if(!name || !about || !avatar) {
+        throw new NotCorrectDataError ("Переданы некорректные данные при создании пользователя.")
+      }
+      res.send({ data: user })
+    })
+    .catch(err => next(err));
 };
