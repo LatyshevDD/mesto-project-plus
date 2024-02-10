@@ -1,7 +1,6 @@
 {
   "name": "starterkits",
   "version": "1.0.0",
-  "type": "module",
   "description": "mesto-project-plus",
   "main": "dist/app.js",
   "scripts": {
