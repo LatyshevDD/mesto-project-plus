@@ -1,6 +1,7 @@
-import express from 'express';
-import { Request, Response } from 'express';
+import express, { Request, Response, NextFunction} from 'express';
 import mongoose from 'mongoose';
+import { IError } from './types/types';
+import userRouter from './routes/users';
 
 const { PORT = 3000 } = process.env;
 
@@ -16,6 +17,20 @@ app.get('/', (req: Request, res: Response) => {
         </body>
         </html>`
     );
+});
+
+app.use('/', userRouter);
+
+app.use((err: IError, req: Request, res: Response, next: NextFunction) => {
+  const { statusCode = 500, message } = err;
+
+  res
+    .status(statusCode)
+    .send({
+      message: statusCode === 500
+        ? 'На сервере произошла ошибка'
+        : message
+    });
 });
 
 app.listen(PORT, () => {

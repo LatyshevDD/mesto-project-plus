@@ -1,6 +1,7 @@
 {
   "name": "starterkits",
   "version": "1.0.0",
+  "type": "module",
   "description": "mesto-project-plus",
   "main": "dist/app.js",
   "scripts": {
@@ -20,7 +21,7 @@
     "eslint-plugin-import": "^2.26.0",
     "ts-node": "^10.9.1",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^4.9.5"
+    "typescript": "^5.3.3"
   },
   "dependencies": {
     "@types/mongoose": "^5.11.97",
