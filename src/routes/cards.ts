@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getCards, postCard, deleteCard } from '../controllers/cards';
+import { getCards, postCard, deleteCard, likeCard, dislikeCard } from '../controllers/cards';
 import { celebrate, Joi } from 'celebrate';
 
 const cardRouter = Router();
@@ -12,5 +12,7 @@ cardRouter.post('/cards', celebrate({
   }),
 }), postCard);
 cardRouter.delete('/cards/:cardId', deleteCard);
+cardRouter.put('/cards/:cardId/likes', likeCard);
+cardRouter.delete('/cards/:cardId/likes', dislikeCard);
 
 export default cardRouter;

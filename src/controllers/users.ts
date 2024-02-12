@@ -63,3 +63,23 @@ export const updateUser = async (req: IRequest, res: Response, next: NextFunctio
     return next(error);
   }
 }
+
+export const updateUserAvatar = async (req: IRequest, res: Response, next: NextFunction) => {
+  try {
+    const _id  = req.user && req.user._id;
+    const { avatar } = req.body;
+    const updatedUser = await User.findByIdAndUpdate(_id, { avatar: avatar }, {new: true}).orFail(() => {
+      throw new NotFoundError('Пользователь по указанному _id не найден.')
+    });
+    res.status(ErrorsStatus.STATUS_OK).send({data: updatedUser});
+  } catch(error: any) {
+    if (error instanceof NotFoundError && error.message === "Пользователь по указанному _id не найден.") {
+      return next(error)
+    };
+    if(error instanceof MongooseError.CastError) {
+      const customError = new NotCorrectDataError("Переданы некорректные данные при запросе информации о пользователе")
+      return next(customError)
+    };
+    return next(error);
+  }
+}

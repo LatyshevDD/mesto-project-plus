@@ -40,3 +40,57 @@ export const deleteCard = async (req: Request, res: Response, next: NextFunction
     return next(error);
   }
 };
+
+export const likeCard = async (req: IRequest, res: Response, next: NextFunction) => {
+  try {
+    const _id = req.user && req.user._id
+    const { cardId } = req.params;
+    const updatedCard = await Card
+      .findByIdAndUpdate(
+        cardId,
+        { $addToSet: { likes: _id } },
+        { new: true },
+      )
+      .orFail(() => {
+        throw new NotFoundError('Карточка по указанному _id не найдена.')
+      });
+
+    res.status(ErrorsStatus.STATUS_OK).send({data: updatedCard});
+  } catch(error) {
+    if (error instanceof NotFoundError && error.message === "Карточка по указанному _id не найдена.") {
+      return next(error)
+    };
+    if(error instanceof MongooseError.CastError) {
+      const customError = new NotCorrectDataError("Переданы некорректные данные при запросе информации о пользователе")
+      return next(customError)
+    };
+    return next(error);
+  }
+}
+
+export const dislikeCard = async (req: IRequest, res: Response, next: NextFunction) => {
+  try {
+    const _id = req.user && req.user._id
+    const { cardId } = req.params;
+    const updatedCard = await Card
+      .findByIdAndUpdate(
+        cardId,
+        { $pull: { likes: _id } },
+        { new: true },
+      )
+      .orFail(() => {
+        throw new NotFoundError('Карточка по указанному _id не найдена.')
+      });
+
+    res.status(ErrorsStatus.STATUS_OK).send({data: updatedCard});
+  } catch(error) {
+    if (error instanceof NotFoundError && error.message === "Карточка по указанному _id не найдена.") {
+      return next(error)
+    };
+    if(error instanceof MongooseError.CastError) {
+      const customError = new NotCorrectDataError("Переданы некорректные данные при запросе информации о пользователе")
+      return next(customError)
+    };
+    return next(error);
+  }
+}
