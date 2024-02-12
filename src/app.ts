@@ -5,6 +5,7 @@ import { IRequest } from './types/types';
 import userRouter from './routes/users';
 import cardRouter from './routes/cards';
 import { ErrorsStatus } from './types/types';
+import { errors } from 'celebrate';
 
 const { PORT = 3000 } = process.env;
 
@@ -35,6 +36,8 @@ app.use((req: IRequest, res: Response, next: NextFunction) => {
 
 app.use('/', userRouter);
 app.use('/', cardRouter);
+
+app.use(errors());
 
 app.use((err: IError, req: Request, res: Response, next: NextFunction) => {
   const { statusCode = ErrorsStatus.STATUS_INTERNAL_SERVER_ERROR, message } = err;

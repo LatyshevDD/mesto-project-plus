@@ -5,6 +5,7 @@ import NotCorrectDataError from "../errors/not-correct-data-400";
 import { ErrorsStatus } from "../types/types";
 import { ObjectId } from "bson";
 import mongoose, {Error as MongooseError } from "mongoose";
+import { isCelebrateError } from "celebrate";
 
 export const getUsers = (req: Request, res: Response) => {
   User.find({})
@@ -24,21 +25,22 @@ export const getUser = async (req: Request, res: Response, next: NextFunction) =
       return next(error)
     };
     if(error instanceof MongooseError.CastError) {
-      const err = new NotCorrectDataError("Переданы некорректные данные при запросе информации о пользователе")
-      return next(err)
+      const customError = new NotCorrectDataError("Переданы некорректные данные при запросе информации о пользователе")
+      return next(customError)
     };
+    return next(error);
   }
 };
 
 export const postUser = (req: Request, res: Response, next: NextFunction) => {
+
   const { name, about, avatar } = req.body;
 
   User.create({ name, about, avatar })
     .then(user => {
-      if(!name || !about || !avatar) {
-        throw new NotCorrectDataError ("Переданы некорректные данные при создании пользователя.")
-      }
       res.send({ data: user })
     })
-    .catch(err => next(err));
+    .catch(error => {
+      return next(error);
+    });
 };
