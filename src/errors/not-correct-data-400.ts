@@ -1,4 +1,4 @@
-import { ErrorsStatus } from "../types/types";
+import { ErrorsStatus } from '../types/types';
 
 export default class NotCorrectDataError extends Error {
   statusCode: number;
@@ -6,5 +6,5 @@ export default class NotCorrectDataError extends Error {
   constructor(message: string) {
     super(message);
     this.statusCode = ErrorsStatus.STATUS_BAD_REQUEST;
-  };
+  }
 }
