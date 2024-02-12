@@ -16,8 +16,19 @@ export const postCard = (req: IRequest, res: Response, next: NextFunction) => {
   Card.create({ name: name, link: link, owner: req.user && req.user._id})
     .then(card => {
       if(!name || !link) {
-        throw new NotCorrectDataError ("Переданы некорректные данные при создании пользователя.")
+        throw new NotCorrectDataError ("Переданы некорректные данные при создании карточки.")
       }
+      res.send({ data: card })
+    })
+    .catch(err => next(err));
+};
+
+export const deleteCard = (req: Request, res: Response, next: NextFunction) => {
+  Card.findByIdAndDelete(req.params.cardId)
+    .then(card => {
+      if (!card) {
+        throw new NotFoundError('Карточка с указанным _id не найдена.');
+      };
       res.send({ data: card })
     })
     .catch(err => next(err));

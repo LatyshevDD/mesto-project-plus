@@ -4,6 +4,7 @@ import { IError } from './types/types';
 import { IRequest } from './types/types';
 import userRouter from './routes/users';
 import cardRouter from './routes/cards';
+import { ErrorsStatus } from './types/types';
 
 const { PORT = 3000 } = process.env;
 
@@ -36,7 +37,7 @@ app.use('/', userRouter);
 app.use('/', cardRouter);
 
 app.use((err: IError, req: Request, res: Response, next: NextFunction) => {
-  const { statusCode = 500, message } = err;
+  const { statusCode = ErrorsStatus.STATUS_INTERNAL_SERVER_ERROR, message } = err;
 
   res
     .status(statusCode)
