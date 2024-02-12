@@ -33,7 +33,6 @@ export const getUser = async (req: Request, res: Response, next: NextFunction) =
 };
 
 export const postUser = (req: Request, res: Response, next: NextFunction) => {
-
   const { name, about, avatar } = req.body;
 
   User.create({ name, about, avatar })

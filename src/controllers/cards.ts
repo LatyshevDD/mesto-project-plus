@@ -15,9 +15,6 @@ export const postCard = (req: IRequest, res: Response, next: NextFunction) => {
 
   Card.create({ name: name, link: link, owner: req.user && req.user._id})
     .then(card => {
-      if(!name || !link) {
-        throw new NotCorrectDataError ("Переданы некорректные данные при создании карточки.")
-      }
       res.send({ data: card })
     })
     .catch(err => next(err));
