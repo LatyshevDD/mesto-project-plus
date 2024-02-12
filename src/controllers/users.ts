@@ -19,7 +19,7 @@ export const getUser = async (req: Request, res: Response, next: NextFunction) =
     const user = await User.findById(userId).orFail(() => {
       throw new NotFoundError('Пользователь по указанному _id не найден.')
     });
-    res.status(ErrorsStatus.STATUS_OK).send(user);
+    res.status(ErrorsStatus.STATUS_OK).send({data: user});
   } catch (error: any) {
     if (error instanceof NotFoundError && error.message === "Пользователь по указанному _id не найден.") {
       return next(error)
