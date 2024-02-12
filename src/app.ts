@@ -28,7 +28,7 @@ app.get('/', (req: Request, res: Response) => {
 
 app.use((req: IRequest, res: Response, next: NextFunction) => {
   req.user = {
-    _id: '5d8b8592978f8bd833ca8133'
+    _id: '65c72bb6a5e2c2c8ca4e35fb'
   };
 
   next();
