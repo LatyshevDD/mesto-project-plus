@@ -16,16 +16,6 @@ app.use(express.urlencoded({ extended: true }));
 
 mongoose.connect('mongodb://localhost:27017/mestodb');
 
-app.get('/', (req: Request, res: Response) => {
-  res.send(
-        `<html>
-        <body>
-            <p>Ответ на сигнал из далёкого космоса</p>
-        </body>
-        </html>`
-    );
-});
-
 app.use((req: IRequest, res: Response, next: NextFunction) => {
   req.user = {
     _id: '65c72bb6a5e2c2c8ca4e35fb'
