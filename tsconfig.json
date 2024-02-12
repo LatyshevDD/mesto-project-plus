@@ -23,4 +23,5 @@
   "exclude": [
     "node_modules"
   ],
+  "no-underscore-dangle":  ["error", { "allow": ["_id"] }]
 }
