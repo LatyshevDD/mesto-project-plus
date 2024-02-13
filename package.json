@@ -28,6 +28,7 @@
     "@typescript-eslint/parser": "^6.21.0",
     "celebrate": "^15.0.3",
     "express": "^4.18.1",
+    "helmet": "^7.1.0",
     "mongoose": "^6.12.6"
   }
 }
