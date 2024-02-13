@@ -1,5 +1,4 @@
-import NotFoundError from "../errors/not-found-error-404";
-import { Request } from "express";
+import { Request } from 'express';
 
 export enum ErrorsStatus {
   STATUS_OK = 200,
