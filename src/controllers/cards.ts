@@ -3,7 +3,7 @@ import { Error as MongooseError } from 'mongoose';
 import Card from '../models/card';
 import NotFoundError from '../errors/not-found-error-404';
 import NotCorrectDataError from '../errors/not-correct-data-400';
-import { IRequest, ErrorsStatus } from '../types/types';
+import { IRequest, ErrorsStatus, SuccessStatus } from '../types/types';
 
 export const getCards = (req: Request, res: Response) => {
   Card.find({})
@@ -16,9 +16,15 @@ export const postCard = (req: IRequest, res: Response, next: NextFunction) => {
 
   Card.create({ name, link, owner: req.user && req.user._id })
     .then((card) => {
-      res.send({ data: card });
+      res.status(SuccessStatus.STATUS_CREATED).send({ data: card });
     })
-    .catch((err) => next(err));
+    .catch((err) => {
+      if (err instanceof MongooseError.ValidationError) {
+        const customError = new NotCorrectDataError('Переданы некорректные данные при запросе информации о карточке');
+        return next(customError);
+      }
+      next(err)
+    });
 };
 
 export const deleteCard = async (req: Request, res: Response, next: NextFunction) => {
@@ -29,11 +35,8 @@ export const deleteCard = async (req: Request, res: Response, next: NextFunction
     });
     return res.status(ErrorsStatus.STATUS_OK).send({ data: card });
   } catch (error: any) {
-    if (error instanceof NotFoundError && error.message === 'Карточка по указанному _id не найдена.') {
-      return next(error);
-    }
     if (error instanceof MongooseError.CastError) {
-      const customError = new NotCorrectDataError('Переданы некорректные данные при запросе информации о пользователе');
+      const customError = new NotCorrectDataError('Переданы некорректные данные при запросе информации о карточке');
       return next(customError);
     }
     return next(error);
@@ -56,11 +59,8 @@ export const likeCard = async (req: IRequest, res: Response, next: NextFunction)
 
     return res.status(ErrorsStatus.STATUS_OK).send({ data: updatedCard });
   } catch (error) {
-    if (error instanceof NotFoundError && error.message === 'Карточка по указанному _id не найдена.') {
-      return next(error);
-    }
     if (error instanceof MongooseError.CastError) {
-      const customError = new NotCorrectDataError('Переданы некорректные данные при запросе информации о пользователе');
+      const customError = new NotCorrectDataError('Переданы некорректные данные при запросе информации о карточке');
       return next(customError);
     }
     return next(error);
@@ -83,11 +83,8 @@ export const dislikeCard = async (req: IRequest, res: Response, next: NextFuncti
 
     return res.status(ErrorsStatus.STATUS_OK).send({ data: updatedCard });
   } catch (error) {
-    if (error instanceof NotFoundError && error.message === 'Карточка по указанному _id не найдена.') {
-      return next(error);
-    }
     if (error instanceof MongooseError.CastError) {
-      const customError = new NotCorrectDataError('Переданы некорректные данные при запросе информации о пользователе');
+      const customError = new NotCorrectDataError('Переданы некорректные данные при запросе информации о карточке');
       return next(customError);
     }
     return next(error);

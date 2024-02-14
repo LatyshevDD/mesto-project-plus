@@ -3,7 +3,7 @@ import { Error as MongooseError } from 'mongoose';
 import User from '../models/user';
 import NotFoundError from '../errors/not-found-error-404';
 import NotCorrectDataError from '../errors/not-correct-data-400';
-import { ErrorsStatus, IRequest } from '../types/types';
+import { ErrorsStatus, IRequest, SuccessStatus } from '../types/types';
 
 export const getUsers = (req: Request, res: Response) => {
   User.find({})
@@ -19,9 +19,6 @@ export const getUser = async (req: Request, res: Response, next: NextFunction) =
     });
     return res.status(ErrorsStatus.STATUS_OK).send({ data: user });
   } catch (error: any) {
-    if (error instanceof NotFoundError && error.message === 'Пользователь по указанному _id не найден.') {
-      return next(error);
-    }
     if (error instanceof MongooseError.CastError) {
       const customError = new NotCorrectDataError('Переданы некорректные данные при запросе информации о пользователе');
       return next(customError);
@@ -34,8 +31,14 @@ export const postUser = (req: Request, res: Response, next: NextFunction) => {
   const { name, about, avatar } = req.body;
 
   User.create({ name, about, avatar })
-    .then((user) => res.send({ data: user }))
-    .catch((error) => next(error));
+    .then((user) => res.status(SuccessStatus.STATUS_CREATED).send({ data: user }))
+    .catch((error) => {
+      if (error instanceof MongooseError.ValidationError) {
+        const customError = new NotCorrectDataError('Переданы некорректные данные при запросе информации о пользователе');
+        return next(customError);
+      }
+      next(error)
+    });
 };
 
 export const updateUser = async (req: IRequest, res: Response, next: NextFunction) => {
@@ -43,15 +46,12 @@ export const updateUser = async (req: IRequest, res: Response, next: NextFunctio
     const _id = req.user && req.user._id;
     const { name, about } = req.body;
     const updatedUser = await User
-      .findByIdAndUpdate(_id, { name, about }, { new: true })
+      .findByIdAndUpdate(_id, { name, about }, { new: true, runValidators: true })
       .orFail(() => {
         throw new NotFoundError('Пользователь по указанному _id не найден.');
       });
     return res.status(ErrorsStatus.STATUS_OK).send({ data: updatedUser });
   } catch (error: any) {
-    if (error instanceof NotFoundError && error.message === 'Пользователь по указанному _id не найден.') {
-      return next(error);
-    }
     if (error instanceof MongooseError.CastError) {
       const customError = new NotCorrectDataError('Переданы некорректные данные при запросе информации о пользователе');
       return next(customError);
@@ -64,14 +64,11 @@ export const updateUserAvatar = async (req: IRequest, res: Response, next: NextF
   try {
     const _id = req.user && req.user._id;
     const { avatar } = req.body;
-    const updatedUser = await User.findByIdAndUpdate(_id, { avatar }, { new: true }).orFail(() => {
+    const updatedUser = await User.findByIdAndUpdate(_id, { avatar }, { new: true, runValidators: true }).orFail(() => {
       throw new NotFoundError('Пользователь по указанному _id не найден.');
     });
     return res.status(ErrorsStatus.STATUS_OK).send({ data: updatedUser });
   } catch (error: any) {
-    if (error instanceof NotFoundError && error.message === 'Пользователь по указанному _id не найден.') {
-      return next(error);
-    }
     if (error instanceof MongooseError.CastError) {
       const customError = new NotCorrectDataError('Переданы некорректные данные при запросе информации о пользователе');
       return next(customError);
