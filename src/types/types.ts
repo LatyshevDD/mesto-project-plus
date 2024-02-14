@@ -6,6 +6,10 @@ export enum ErrorsStatus {
   STATUS_BAD_REQUEST = 400,
   STATUS_INTERNAL_SERVER_ERROR = 500,
 }
+
+export enum SuccessStatus {
+  STATUS_CREATED = 201,
+}
 export interface IError {
   statusCode: number;
   message: string;
