@@ -37,7 +37,7 @@ export const postUser = (req: Request, res: Response, next: NextFunction) => {
         const customError = new NotCorrectDataError('Переданы некорректные данные при запросе информации о пользователе');
         return next(customError);
       }
-      next(error)
+      return next(error);
     });
 };
 
@@ -64,9 +64,11 @@ export const updateUserAvatar = async (req: IRequest, res: Response, next: NextF
   try {
     const _id = req.user && req.user._id;
     const { avatar } = req.body;
-    const updatedUser = await User.findByIdAndUpdate(_id, { avatar }, { new: true, runValidators: true }).orFail(() => {
-      throw new NotFoundError('Пользователь по указанному _id не найден.');
-    });
+    const updatedUser = await User
+      .findByIdAndUpdate(_id, { avatar }, { new: true, runValidators: true })
+      .orFail(() => {
+        throw new NotFoundError('Пользователь по указанному _id не найден.');
+      });
     return res.status(ErrorsStatus.STATUS_OK).send({ data: updatedUser });
   } catch (error: any) {
     if (error instanceof MongooseError.CastError) {

@@ -23,7 +23,7 @@ export const postCard = (req: IRequest, res: Response, next: NextFunction) => {
         const customError = new NotCorrectDataError('Переданы некорректные данные при запросе информации о карточке');
         return next(customError);
       }
-      next(err)
+      return next(err);
     });
 };
 
