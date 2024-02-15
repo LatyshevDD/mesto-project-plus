@@ -34,7 +34,6 @@ const userSchema = new Schema<IUser>(
     email: {
       type: String,
       required: true,
-      unique: true,
       validate: {
         validator: (v: string) => validator.isEmail(v),
         message: 'Некорректный email',
@@ -47,5 +46,7 @@ const userSchema = new Schema<IUser>(
   },
   { versionKey: false },
 );
+
+userSchema.index({ email: 1 }, { unique: true });
 
 export default model<IUser>('user', userSchema);
