@@ -28,9 +28,9 @@ export const getUser = async (req: Request, res: Response, next: NextFunction) =
 };
 
 export const postUser = (req: Request, res: Response, next: NextFunction) => {
-  const { name, about, avatar } = req.body;
+  const { name, about, avatar, email, password } = req.body;
 
-  User.create({ name, about, avatar })
+  User.create({ name, about, avatar, email, password })
     .then((user) => res.status(SuccessStatus.STATUS_CREATED).send({ data: user }))
     .catch((error) => {
       if (error instanceof MongooseError.ValidationError) {
