@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { Error as MongooseError } from 'mongoose';
+import bcrypt from 'bcrypt';
 import User from '../models/user';
 import NotFoundError from '../errors/not-found-error-404';
 import NotCorrectDataError from '../errors/not-correct-data-400';
@@ -30,8 +31,13 @@ export const getUser = async (req: Request, res: Response, next: NextFunction) =
 export const postUser = (req: Request, res: Response, next: NextFunction) => {
   const { name, about, avatar, email, password } = req.body;
 
-  User.create({ name, about, avatar, email, password })
-    .then((user) => res.status(SuccessStatus.STATUS_CREATED).send({ data: user }))
+  bcrypt.hash(password, 10)
+    .then(hash => {
+      return User.create({ name, about, avatar, email, password: hash })
+    })
+    .then((user) => {
+      res.status(SuccessStatus.STATUS_CREATED).send({ data: user })
+    })
     .catch((error) => {
       if (error instanceof MongooseError.ValidationError) {
         const customError = new NotCorrectDataError('Переданы некорректные данные при запросе информации о пользователе');
