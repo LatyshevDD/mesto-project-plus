@@ -15,7 +15,6 @@ export default (req: IRequest, res: Response, next: NextFunction) => {
 
   try {
     payload = jwt.verify(token, 'some-secret-key') as JwtPayload;
-    console.log(payload)
   } catch (err) {
     throw new AuthError('Ошибка авторизации');
   }
