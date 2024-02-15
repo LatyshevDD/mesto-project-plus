@@ -7,7 +7,7 @@ import userRouter from './routes/users';
 import cardRouter from './routes/cards';
 import { ErrorsStatus } from './types/types';
 import { errors } from 'celebrate';
-import NotFoundError from './errors/not-found-error-404';
+import { createUser, login } from './controllers/users';
 
 const { PORT = 3000 } = process.env;
 
@@ -29,6 +29,8 @@ app.use((req: IRequest, res: Response, next: NextFunction) => {
 
 app.use('/', userRouter);
 app.use('/', cardRouter);
+app.post('/signin', login);
+app.post('/signup', createUser);
 app.use('*', (req: Request, res: Response) => {
   res
     .status(ErrorsStatus.STATUS_NOT_FOUND)

@@ -29,7 +29,7 @@ export const getUser = async (req: Request, res: Response, next: NextFunction) =
   }
 };
 
-export const postUser = (req: Request, res: Response, next: NextFunction) => {
+export const createUser = (req: Request, res: Response, next: NextFunction) => {
   const { name, about, avatar, email, password } = req.body;
 
   bcrypt.hash(password, 10)
@@ -90,20 +90,21 @@ export const updateUserAvatar = async (req: IRequest, res: Response, next: NextF
   }
 };
 
-// export const login = async (req: IRequest, res: Response, next: NextFunction) => {
-//   try {
-//     const { email, password } = req.body;
-//     const updatedUser = await User
-//       .findByIdAndUpdate(_id, { name, about }, { new: true, runValidators: true })
-//       .orFail(() => {
-//         throw new NotFoundError('Пользователь по указанному _id не найден.');
-//       });
-//     return res.status(ErrorsStatus.STATUS_OK).send({ data: updatedUser });
-//   } catch (error: any) {
-//     if (error instanceof MongooseError.CastError) {
-//       const customError = new NotCorrectDataError('Переданы некорректные данные при запросе информации о пользователе');
-//       return next(customError);
-//     }
-//     return next(error);
-//   }
-// };
+export const login = (req: IRequest, res: Response, next: NextFunction) => {
+    const { email, password } = req.body;
+    User
+      .findOne({ email })
+      .orFail(() => {
+        throw new NotFoundError('Пользователь по указанному email не найден.');
+      })
+      .then((user) => {
+        return res.send(user);
+      })
+     .catch((error: any) => {
+      if (error instanceof MongooseError.CastError) {
+      const customError = new NotCorrectDataError('Переданы некорректные данные в процессе авторизации');
+      return next(customError);
+      }
+      return next(error);
+    })
+};
