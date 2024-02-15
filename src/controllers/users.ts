@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { Error as MongooseError } from 'mongoose';
+import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import User from '../models/user';
 import NotFoundError from '../errors/not-found-error-404';
@@ -95,10 +96,20 @@ export const login = (req: IRequest, res: Response, next: NextFunction) => {
     User
       .findOne({ email })
       .orFail(() => {
-        throw new NotFoundError('Пользователь по указанному email не найден.');
+        throw new NotFoundError('Введен непральный пароль или email');
       })
       .then((user) => {
-        return res.send(user);
+        return bcrypt.compare(password, user.password)
+          .then((matched) => {
+            if (!matched) {
+              throw new NotFoundError('Введен непральный пароль или email');
+            }
+            return user;
+          })
+      })
+      .then((user) => {
+        const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
+        res.send({ token });
       })
      .catch((error: any) => {
       if (error instanceof MongooseError.CastError) {
