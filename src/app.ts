@@ -1,5 +1,6 @@
 import express, { Request, Response, NextFunction} from 'express';
 import mongoose from 'mongoose';
+import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import { IError } from './types/types';
 import { IRequest } from './types/types';
@@ -8,24 +9,27 @@ import cardRouter from './routes/cards';
 import { ErrorsStatus } from './types/types';
 import { errors } from 'celebrate';
 import { createUser, login } from './controllers/users';
+import auth from './middlewares/auth';
 
 const { PORT = 3000 } = process.env;
 
 const app = express();
 
+app.use(cookieParser());
 app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 mongoose.connect('mongodb://localhost:27017/mestodb');
 
-app.use((req: IRequest, res: Response, next: NextFunction) => {
-  req.user = {
-    _id: '65c72bb6a5e2c2c8ca4e35fb'
-  };
+app.use(auth);
+// app.use((req: IRequest, res: Response, next: NextFunction) => {
+//   req.user = {
+//     _id: '65c72bb6a5e2c2c8ca4e35fb'
+//   };
 
-  next();
-});
+//   next();
+// });
 
 app.use('/', userRouter);
 app.use('/', cardRouter);
