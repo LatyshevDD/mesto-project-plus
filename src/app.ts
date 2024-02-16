@@ -22,7 +22,6 @@ app.use(express.urlencoded({ extended: true }));
 
 mongoose.connect('mongodb://localhost:27017/mestodb');
 
-app.use(auth);
 // app.use((req: IRequest, res: Response, next: NextFunction) => {
 //   req.user = {
 //     _id: '65c72bb6a5e2c2c8ca4e35fb'
@@ -31,10 +30,14 @@ app.use(auth);
 //   next();
 // });
 
-app.use('/', userRouter);
-app.use('/', cardRouter);
 app.post('/signin', login);
 app.post('/signup', createUser);
+
+app.use(auth);
+
+app.use('/', userRouter);
+app.use('/', cardRouter);
+
 app.use('*', (req: Request, res: Response) => {
   res
     .status(ErrorsStatus.STATUS_NOT_FOUND)

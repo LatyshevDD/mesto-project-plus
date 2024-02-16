@@ -17,6 +17,9 @@ export const getUsers = (req: Request, res: Response) => {
 export const getUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { userId } = req.params;
+    if(userId === "me") {
+      return next();
+    }
     const user = await User.findById(userId).orFail(() => {
       throw new NotFoundError('Пользователь по указанному _id не найден.');
     });
@@ -123,4 +126,20 @@ export const login = (req: IRequest, res: Response, next: NextFunction) => {
       }
       return next(error);
     })
+};
+
+export const getCurrentUser = async (req: IRequest, res: Response, next: NextFunction) => {
+  try {
+    const _id = req.user && req.user._id;
+    const user = await User.findById(_id).orFail(() => {
+      throw new NotFoundError('Не удалось определить пользователя. Повторите авторизацию');
+    });
+    return res.status(ErrorsStatus.STATUS_OK).send({ data: user });
+  } catch (error: any) {
+    if (error instanceof MongooseError.CastError) {
+      const customError = new NotCorrectDataError('Не удалось определить пользователя.  Повторите авторизацию');
+      return next(customError);
+    }
+    return next(error);
+  }
 };
