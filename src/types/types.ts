@@ -7,6 +7,7 @@ export enum ErrorsStatus {
   STATUS_BAD_REQUEST = 400,
   STATUS_INTERNAL_SERVER_ERROR = 500,
   STATUS_AUTH_ERROR = 401,
+  STATUS_EMAIL_ERROR = 409,
 }
 
 export enum SuccessStatus {

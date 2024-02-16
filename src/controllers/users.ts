@@ -5,6 +5,7 @@ import bcrypt from 'bcrypt';
 import User from '../models/user';
 import NotFoundError from '../errors/not-found-error-404';
 import NotCorrectDataError from '../errors/not-correct-data-400';
+import EmailError from '../errors/email-error-409';
 import { ErrorsStatus, IRequest, SuccessStatus } from '../types/types';
 import { MongoError } from 'mongodb';
 
@@ -49,7 +50,7 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
         return next(customError);
       }
       if (error instanceof MongoError) {
-        const customError = new NotCorrectDataError('Пользователь с таким email уже существует');
+        const customError = new EmailError('Пользователь с таким email уже существует');
         return next(customError);
       }
       return next(error);
