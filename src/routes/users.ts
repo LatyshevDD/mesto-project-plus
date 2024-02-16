@@ -1,7 +1,7 @@
 import { celebrate, Joi } from 'celebrate';
 import { Router } from 'express';
 import {
-  getUser, getUsers, updateUser, updateUserAvatar, getCurrentUser
+  getUser, getUsers, updateUser, updateUserAvatar, getCurrentUser,
 } from '../controllers/users';
 
 const userRouter = Router();

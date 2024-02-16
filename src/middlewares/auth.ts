@@ -1,8 +1,8 @@
 import jwt from 'jsonwebtoken';
+import type { JwtPayload } from 'jsonwebtoken';
 import { Response, NextFunction } from 'express';
 import { IRequest } from '../types/types';
 import AuthError from '../errors/auth-error-401';
-import type { JwtPayload } from "jsonwebtoken";
 
 export default (req: IRequest, res: Response, next: NextFunction) => {
   const token = req.cookies.jwt;
@@ -20,7 +20,7 @@ export default (req: IRequest, res: Response, next: NextFunction) => {
   }
 
   req.user = {
-    _id: payload._id
+    _id: payload._id,
   };
 
   next();

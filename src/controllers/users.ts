@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { Error as MongooseError } from 'mongoose';
+import { MongoError } from 'mongodb';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import User from '../models/user';
@@ -7,7 +8,6 @@ import NotFoundError from '../errors/not-found-error-404';
 import NotCorrectDataError from '../errors/not-correct-data-400';
 import EmailError from '../errors/email-error-409';
 import { ErrorsStatus, IRequest, SuccessStatus } from '../types/types';
-import { MongoError } from 'mongodb';
 
 export const getUsers = (req: Request, res: Response) => {
   User.find({})
@@ -18,7 +18,7 @@ export const getUsers = (req: Request, res: Response) => {
 export const getUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { userId } = req.params;
-    if(userId === "me") {
+    if (userId === 'me') {
       return next();
     }
     const user = await User.findById(userId).orFail(() => {
@@ -35,14 +35,16 @@ export const getUser = async (req: Request, res: Response, next: NextFunction) =
 };
 
 export const createUser = (req: Request, res: Response, next: NextFunction) => {
-  const { name, about, avatar, email, password } = req.body;
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
 
   bcrypt.hash(password, 10)
-    .then(hash => {
-      return User.create({ name, about, avatar, email, password: hash })
-    })
+    .then((hash) => User.create({
+      name, about, avatar, email, password: hash,
+    }))
     .then((user) => {
-      res.status(SuccessStatus.STATUS_CREATED).send({ data: user })
+      res.status(SuccessStatus.STATUS_CREATED).send({ data: user });
     })
     .catch((error) => {
       if (error instanceof MongooseError.ValidationError) {
@@ -96,38 +98,36 @@ export const updateUserAvatar = async (req: IRequest, res: Response, next: NextF
 };
 
 export const login = (req: IRequest, res: Response, next: NextFunction) => {
-    const { email, password } = req.body;
-    User
-      .findOne({ email })
-      .select('+password')
-      .orFail(() => {
-        throw new NotFoundError('Введен непральный пароль или email');
-      })
-      .then((user) => {
-        return bcrypt.compare(password, user.password)
-          .then((matched) => {
-            if (!matched) {
-              throw new NotFoundError('Введен непральный пароль или email');
-            }
-            return user;
-          })
-      })
-      .then((user) => {
-        const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
-        res
-          .cookie('jwt', token, {
-            maxAge: 3600000 * 24 * 7 ,
-            httpOnly: true
-          })
-          .end();
-      })
-     .catch((error: any) => {
+  const { email, password } = req.body;
+  User
+    .findOne({ email })
+    .select('+password')
+    .orFail(() => {
+      throw new NotFoundError('Введен непральный пароль или email');
+    })
+    .then((user) => bcrypt.compare(password, user.password)
+      .then((matched) => {
+        if (!matched) {
+          throw new NotFoundError('Введен непральный пароль или email');
+        }
+        return user;
+      }))
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
+      res
+        .cookie('jwt', token, {
+          maxAge: 3600000 * 24 * 7,
+          httpOnly: true,
+        })
+        .end();
+    })
+    .catch((error: any) => {
       if (error instanceof MongooseError.CastError) {
-      const customError = new NotCorrectDataError('Переданы некорректные данные в процессе авторизации');
-      return next(customError);
+        const customError = new NotCorrectDataError('Переданы некорректные данные в процессе авторизации');
+        return next(customError);
       }
       return next(error);
-    })
+    });
 };
 
 export const getCurrentUser = async (req: IRequest, res: Response, next: NextFunction) => {
