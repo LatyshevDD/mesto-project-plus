@@ -98,6 +98,7 @@ export const login = (req: IRequest, res: Response, next: NextFunction) => {
     const { email, password } = req.body;
     User
       .findOne({ email })
+      .select('+password')
       .orFail(() => {
         throw new NotFoundError('Введен непральный пароль или email');
       })
