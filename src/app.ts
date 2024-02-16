@@ -10,6 +10,7 @@ import { ErrorsStatus } from './types/types';
 import { errors } from 'celebrate';
 import { createUser, login } from './controllers/users';
 import auth from './middlewares/auth';
+import { requestLogger, errorLogger } from './middlewares/logger';
 
 const { PORT = 3000 } = process.env;
 
@@ -21,6 +22,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 mongoose.connect('mongodb://localhost:27017/mestodb');
+
+app.use(requestLogger);
 
 app.post('/signin', login);
 app.post('/signup', createUser);
@@ -35,6 +38,9 @@ app.use('*', (req: Request, res: Response) => {
     .status(ErrorsStatus.STATUS_NOT_FOUND)
     .send({ message: 'Запрашиваемый ресурс не найден' });
 });
+
+app.use(errorLogger);
+
 app.use(errors());
 
 app.use((err: IError, req: Request, res: Response, next: NextFunction) => {
