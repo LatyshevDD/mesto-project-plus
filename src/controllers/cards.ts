@@ -3,7 +3,9 @@ import { Error as MongooseError } from 'mongoose';
 import Card from '../models/card';
 import NotFoundError from '../errors/not-found-error-404';
 import NotCorrectDataError from '../errors/not-correct-data-400';
+import AuthError from '../errors/auth-error-401';
 import { IRequest, ErrorsStatus, SuccessStatus } from '../types/types';
+import { ObjectID } from 'mongodb';
 
 export const getCards = (req: Request, res: Response) => {
   Card.find({})
@@ -27,9 +29,16 @@ export const postCard = (req: IRequest, res: Response, next: NextFunction) => {
     });
 };
 
-export const deleteCard = async (req: Request, res: Response, next: NextFunction) => {
+export const deleteCard = async (req: IRequest, res: Response, next: NextFunction) => {
   try {
     const { cardId } = req.params;
+    const userId = req.user && req.user._id;
+    const delitingCard = await Card.findById(cardId).orFail(() => {
+      throw new NotFoundError('Карточка по указанному _id не найдена.');
+    });
+    if(!(userId === delitingCard.owner.toString())) {
+      throw new AuthError('У вас недостаточно прав для осуществления действия')
+    }
     const card = await Card.findByIdAndDelete(cardId).orFail(() => {
       throw new NotFoundError('Карточка по указанному _id не найдена.');
     });

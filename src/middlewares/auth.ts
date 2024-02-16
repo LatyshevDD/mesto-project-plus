@@ -20,7 +20,7 @@ export default (req: IRequest, res: Response, next: NextFunction) => {
   }
 
   req.user = {
-    _id: payload
+    _id: payload._id
   };
 
   next();
