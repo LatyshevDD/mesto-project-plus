@@ -9,9 +9,7 @@ import { IRequest, ErrorsStatus, SuccessStatus } from '../types/types';
 export const getCards = (req: Request, res: Response, next: NextFunction) => {
   Card.find({})
     .then((cards) => res.send({ data: cards }))
-    .catch((err) => {
-      return next(err);
-    });
+    .catch((err) => next(err));
 };
 
 export const postCard = (req: IRequest, res: Response, next: NextFunction) => {

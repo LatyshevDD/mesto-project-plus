@@ -12,9 +12,7 @@ import { ErrorsStatus, IRequest, SuccessStatus } from '../types/types';
 export const getUsers = (req: Request, res: Response, next: NextFunction) => {
   User.find({})
     .then((users) => res.send({ data: users }))
-    .catch((err) => {
-      return next(err);
-    });
+    .catch((err) => next(err));
 };
 
 export const getUser = async (req: Request, res: Response, next: NextFunction) => {
@@ -124,7 +122,5 @@ export const login = (req: IRequest, res: Response, next: NextFunction) => {
         })
         .end();
     })
-    .catch((error: any) => {
-      return next(error);
-    });
+    .catch((error: any) => next(error));
 };
