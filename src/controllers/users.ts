@@ -34,6 +34,18 @@ export const getUser = async (req: Request, res: Response, next: NextFunction) =
   }
 };
 
+export const getCurrentUser = async (req: IRequest, res: Response, next: NextFunction) => {
+  try {
+    const _id = req.user && req.user._id;
+    const user = await User.findById(_id).orFail(() => {
+      throw new NotFoundError('Не удалось определить пользователя. Повторите авторизацию');
+    });
+    return res.status(ErrorsStatus.STATUS_OK).send({ data: user });
+  } catch (error: any) {
+    return next(error);
+  }
+};
+
 export const createUser = (req: Request, res: Response, next: NextFunction) => {
   const {
     name, about, avatar, email, password,
@@ -120,16 +132,4 @@ export const login = (req: IRequest, res: Response, next: NextFunction) => {
       }
       return next(error);
     });
-};
-
-export const getCurrentUser = async (req: IRequest, res: Response, next: NextFunction) => {
-  try {
-    const _id = req.user && req.user._id;
-    const user = await User.findById(_id).orFail(() => {
-      throw new NotFoundError('Не удалось определить пользователя. Повторите авторизацию');
-    });
-    return res.status(ErrorsStatus.STATUS_OK).send({ data: user });
-  } catch (error: any) {
-    return next(error);
-  }
 };
