@@ -15,7 +15,6 @@ export enum SuccessStatus {
 }
 export interface IError extends Error {
   statusCode: number;
-  message: string;
 }
 
 export interface IRequest extends Request {

@@ -12,9 +12,8 @@ import { ErrorsStatus, IRequest, SuccessStatus } from '../types/types';
 export const getUsers = (req: Request, res: Response, next: NextFunction) => {
   User.find({})
     .then((users) => res.send({ data: users }))
-    .catch(() => {
-      const customError = new Error('Ошибка по умолчанию');
-      return next(customError);
+    .catch((err) => {
+      return next(err);
     });
 };
 
@@ -126,10 +125,6 @@ export const login = (req: IRequest, res: Response, next: NextFunction) => {
         .end();
     })
     .catch((error: any) => {
-      if (error instanceof MongooseError.CastError) {
-        const customError = new NotCorrectDataError('Переданы некорректные данные в процессе авторизации');
-        return next(customError);
-      }
       return next(error);
     });
 };

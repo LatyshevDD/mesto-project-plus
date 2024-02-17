@@ -9,9 +9,8 @@ import { IRequest, ErrorsStatus, SuccessStatus } from '../types/types';
 export const getCards = (req: Request, res: Response, next: NextFunction) => {
   Card.find({})
     .then((cards) => res.send({ data: cards }))
-    .catch(() => {
-      const customError = new Error('Ошибка по умолчанию');
-      return next(customError);
+    .catch((err) => {
+      return next(err);
     });
 };
 

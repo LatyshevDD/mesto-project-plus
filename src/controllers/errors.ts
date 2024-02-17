@@ -1,10 +1,11 @@
-import { Response, Request } from 'express';
+import { Response, Request, NextFunction } from 'express';
 import { IError, ErrorsStatus } from '../types/types';
 
 export const rootErrorsController = (
   err: IError,
   req: Request,
   res: Response,
+  next: NextFunction,
 ) => {
   const { statusCode = ErrorsStatus.STATUS_INTERNAL_SERVER_ERROR, message } = err;
 
