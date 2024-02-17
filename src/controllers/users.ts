@@ -15,7 +15,7 @@ export const getUsers = (req: Request, res: Response, next: NextFunction) => {
     .catch(() => {
       const customError = new Error('Ошибка по умолчанию');
       return next(customError);
-  });
+    });
 };
 
 export const getUser = async (req: Request, res: Response, next: NextFunction) => {

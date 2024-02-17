@@ -3,7 +3,7 @@ import { Router } from 'express';
 import {
   getUser, getUsers, updateUser, updateUserAvatar, getCurrentUser,
 } from '../controllers/users';
-import { urlRegEx } from '../constants/constance';
+import { urlRegEx } from '../constants/constants';
 
 const userRouter = Router();
 

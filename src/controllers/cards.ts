@@ -12,7 +12,7 @@ export const getCards = (req: Request, res: Response, next: NextFunction) => {
     .catch(() => {
       const customError = new Error('Ошибка по умолчанию');
       return next(customError);
-  });
+    });
 };
 
 export const postCard = (req: IRequest, res: Response, next: NextFunction) => {
