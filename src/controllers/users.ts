@@ -9,10 +9,13 @@ import NotCorrectDataError from '../errors/not-correct-data-400';
 import EmailError from '../errors/email-error-409';
 import { ErrorsStatus, IRequest, SuccessStatus } from '../types/types';
 
-export const getUsers = (req: Request, res: Response) => {
+export const getUsers = (req: Request, res: Response, next: NextFunction) => {
   User.find({})
     .then((users) => res.send({ data: users }))
-    .catch(() => res.status(500).send({ message: 'Ошибка по умолчанию' }));
+    .catch(() => {
+      const customError = new Error('Ошибка по умолчанию');
+      return next(customError);
+  });
 };
 
 export const getUser = async (req: Request, res: Response, next: NextFunction) => {

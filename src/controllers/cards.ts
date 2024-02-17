@@ -6,10 +6,13 @@ import NotCorrectDataError from '../errors/not-correct-data-400';
 import AuthError from '../errors/auth-error-401';
 import { IRequest, ErrorsStatus, SuccessStatus } from '../types/types';
 
-export const getCards = (req: Request, res: Response) => {
+export const getCards = (req: Request, res: Response, next: NextFunction) => {
   Card.find({})
     .then((cards) => res.send({ data: cards }))
-    .catch(() => res.status(500).send({ message: 'Ошибка по умолчанию' }));
+    .catch(() => {
+      const customError = new Error('Ошибка по умолчанию');
+      return next(customError);
+  });
 };
 
 export const postCard = (req: IRequest, res: Response, next: NextFunction) => {
