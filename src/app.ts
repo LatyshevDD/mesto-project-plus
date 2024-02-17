@@ -4,8 +4,8 @@ import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import { IError } from './types/types';
 import { IRequest } from './types/types';
-import userRouter from './routes/users';
-import cardRouter from './routes/cards';
+import rootRouter from './routes';
+import { rootErrorsController } from './controllers/errors';
 import { ErrorsStatus } from './types/types';
 import { errors } from 'celebrate';
 import { createUser, login } from './controllers/users';
@@ -31,8 +31,7 @@ app.post('/signup', createUser);
 
 app.use(auth);
 
-app.use('/', userRouter);
-app.use('/', cardRouter);
+app.use('/', rootRouter);
 
 app.use('*', (req: Request, res: Response, next: NextFunction) => {
   const customError = new NotFoundError('Запрашиваемый ресурс не найден');
@@ -43,17 +42,7 @@ app.use(errorLogger);
 
 app.use(errors());
 
-app.use((err: IError, req: Request, res: Response, next: NextFunction) => {
-  const { statusCode = ErrorsStatus.STATUS_INTERNAL_SERVER_ERROR, message } = err;
-
-  res
-    .status(statusCode)
-    .send({
-      message: statusCode === 500
-        ? 'Ошибка по умолчанию'
-        : message
-    });
-});
+app.use(rootErrorsController);
 
 app.listen(PORT, () => {
     console.log(`App listening on PORT ${PORT}`)
