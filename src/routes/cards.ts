@@ -3,6 +3,7 @@ import { Router } from 'express';
 import {
   getCards, postCard, deleteCard, likeCard, dislikeCard,
 } from '../controllers/cards';
+import { mongoIdRegEx } from '../constants/constants';
 
 const cardRouter = Router();
 
@@ -13,8 +14,20 @@ cardRouter.post('/cards', celebrate({
     link: Joi.string().required(),
   }),
 }), postCard);
-cardRouter.delete('/cards/:cardId', deleteCard);
-cardRouter.put('/cards/:cardId/likes', likeCard);
-cardRouter.delete('/cards/:cardId/likes', dislikeCard);
+cardRouter.delete('/cards/:cardId', celebrate({
+  params: Joi.object().keys({
+    cardId: Joi.string().regex(mongoIdRegEx).required(),
+  }),
+}), deleteCard);
+cardRouter.put('/cards/:cardId/likes', celebrate({
+  params: Joi.object().keys({
+    cardId: Joi.string().regex(mongoIdRegEx).required(),
+  }),
+}), likeCard);
+cardRouter.delete('/cards/:cardId/likes', celebrate({
+  params: Joi.object().keys({
+    cardId: Joi.string().regex(mongoIdRegEx).required(),
+  }),
+}), dislikeCard);
 
 export default cardRouter;
