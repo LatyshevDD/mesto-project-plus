@@ -9,18 +9,18 @@ import NotCorrectDataError from '../errors/not-correct-data-400';
 import EmailError from '../errors/email-error-409';
 import { ErrorsStatus, IRequest, SuccessStatus } from '../types/types';
 
-export const getUsers = (req: Request, res: Response) => {
+export const getUsers = (req: Request, res: Response, next: NextFunction) => {
   User.find({})
     .then((users) => res.send({ data: users }))
-    .catch(() => res.status(500).send({ message: 'Ошибка по умолчанию' }));
+    .catch(() => {
+      const customError = new Error('Ошибка по умолчанию');
+      return next(customError);
+  });
 };
 
 export const getUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { userId } = req.params;
-    if (userId === 'me') {
-      return next();
-    }
     const user = await User.findById(userId).orFail(() => {
       throw new NotFoundError('Пользователь по указанному _id не найден.');
     });
@@ -70,10 +70,6 @@ export const updateUser = async (req: IRequest, res: Response, next: NextFunctio
       });
     return res.status(ErrorsStatus.STATUS_OK).send({ data: updatedUser });
   } catch (error: any) {
-    if (error instanceof MongooseError.CastError) {
-      const customError = new NotCorrectDataError('Переданы некорректные данные при запросе информации о пользователе');
-      return next(customError);
-    }
     return next(error);
   }
 };
@@ -89,10 +85,6 @@ export const updateUserAvatar = async (req: IRequest, res: Response, next: NextF
       });
     return res.status(ErrorsStatus.STATUS_OK).send({ data: updatedUser });
   } catch (error: any) {
-    if (error instanceof MongooseError.CastError) {
-      const customError = new NotCorrectDataError('Переданы некорректные данные при запросе информации о пользователе');
-      return next(customError);
-    }
     return next(error);
   }
 };
@@ -138,10 +130,6 @@ export const getCurrentUser = async (req: IRequest, res: Response, next: NextFun
     });
     return res.status(ErrorsStatus.STATUS_OK).send({ data: user });
   } catch (error: any) {
-    if (error instanceof MongooseError.CastError) {
-      const customError = new NotCorrectDataError('Не удалось определить пользователя.  Повторите авторизацию');
-      return next(customError);
-    }
     return next(error);
   }
 };
