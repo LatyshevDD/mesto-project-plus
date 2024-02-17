@@ -11,6 +11,7 @@ import { errors } from 'celebrate';
 import { createUser, login } from './controllers/users';
 import auth from './middlewares/auth';
 import { requestLogger, errorLogger } from './middlewares/logger';
+import NotFoundError from './errors/not-found-error-404';
 
 const { PORT = 3000 } = process.env;
 
@@ -33,10 +34,9 @@ app.use(auth);
 app.use('/', userRouter);
 app.use('/', cardRouter);
 
-app.use('*', (req: Request, res: Response) => {
-  res
-    .status(ErrorsStatus.STATUS_NOT_FOUND)
-    .send({ message: 'Запрашиваемый ресурс не найден' });
+app.use('*', (req: Request, res: Response, next: NextFunction) => {
+  const customError = new NotFoundError('Запрашиваемый ресурс не найден');
+  return next(customError);
 });
 
 app.use(errorLogger);

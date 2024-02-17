@@ -13,7 +13,7 @@ export enum ErrorsStatus {
 export enum SuccessStatus {
   STATUS_CREATED = 201,
 }
-export interface IError {
+export interface IError extends Error {
   statusCode: number;
   message: string;
 }
