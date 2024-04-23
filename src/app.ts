@@ -1,11 +1,12 @@
 import express, { Request, Response, NextFunction} from 'express';
-import { celebrate, Joi } from 'celebrate';
+import { celebrate, Joi , errors } from 'celebrate';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import 'dotenv/config';
 import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import rootRouter from './routes';
 import { rootErrorsController } from './controllers/errors';
-import { errors } from 'celebrate';
 import { createUser, login } from './controllers/users';
 import auth from './middlewares/auth';
 import { requestLogger, errorLogger } from './middlewares/logger';
@@ -24,6 +25,12 @@ app.use(express.urlencoded({ extended: true }));
 mongoose.connect('mongodb://localhost:27017/mestodb');
 
 app.use(requestLogger);
+
+app.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Сервер сейчас упадёт');
+  }, 0);
+});
 
 app.post('/signin', celebrate({
   body: Joi.object().keys({

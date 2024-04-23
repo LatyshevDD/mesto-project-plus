@@ -1,13 +1,18 @@
 import { Request, Response, NextFunction } from 'express';
 import { Error as MongooseError } from 'mongoose';
 import { MongoError } from 'mongodb';
-import jwt from 'jsonwebtoken';
+import jwt, { Secret } from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import User from '../models/user';
 import NotFoundError from '../errors/not-found-error-404';
 import NotCorrectDataError from '../errors/not-correct-data-400';
 import EmailError from '../errors/email-error-409';
 import { ErrorsStatus, IRequest, SuccessStatus } from '../types/types';
+
+let key = 'some-secret-key';
+if (process.env.JWT_SECRET) {
+  key = process.env.JWT_SECRET;
+}
 
 export const getUsers = (req: Request, res: Response, next: NextFunction) => {
   User.find({})
@@ -114,7 +119,7 @@ export const login = (req: IRequest, res: Response, next: NextFunction) => {
         return user;
       }))
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
+      const token = jwt.sign({ _id: user._id }, key, { expiresIn: '7d' });
       res
         .cookie('jwt', token, {
           maxAge: 3600000 * 24 * 7,
